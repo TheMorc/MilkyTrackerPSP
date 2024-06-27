@@ -375,4 +375,16 @@ else()
     set(INSTALL_DEST ${CMAKE_INSTALL_BINDIR})
 endif()
 
+target_link_libraries(tracker
+    -lSDL2 -lSDL2main -lpspfpu
+)
+add_definitions(-D__LOWRES__)
+create_pbp_file(
+	TARGET tracker
+	TITLE "MilkyTracker"
+	BUILD_PRX 1
+	ICON_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/psp_icon.png
+	BACKGROUND_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../resources/psp_bg.png
+)
+
 install(TARGETS tracker DESTINATION ${INSTALL_DEST})

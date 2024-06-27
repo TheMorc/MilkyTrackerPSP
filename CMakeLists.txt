@@ -19,6 +19,7 @@
 #  along with MilkyTracker.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+set(CMAKE_TOOLCHAIN_FILE "$ENV{PSPDEV}/psp/share/pspdev.cmake" CACHE PATH "toolchain file")
 cmake_minimum_required(VERSION 3.10)
 project(MilkyTracker)
 
