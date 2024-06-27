@@ -633,12 +633,90 @@ void translateKeyUpEvent(const SDL_Event& event)
 	RaiseEventSerialized(&myEvent);
 }
 
+SDL_Joystick* gGameController = NULL;
+int xDir = 0;
+int yDir = 0;
+int mouseValX = 0;
+int mouseValY = 0;
+
+void MouseAxis()
+{
+	xDir = xDir + (mouseValX/5000);
+	yDir = yDir + (mouseValY/5000);
+
+	SDL_WarpMouseInWindow(myDisplayDevice->getWindow(),xDir, yDir);
+	myDisplayDevice->update(PPRect(xDir, yDir, xDir+20, yDir+20));
+}
+
+//PSP Street/Go layout
+//   4                              5
+//      8                        0
+// 
+//  7       9                3       1
+//
+//      6                        2
+//    PSlogo-12     select-10 start-11
+
+
+
+void MouseButton(int button, int down)
+{
+	switch (button){
+		case 2:
+			if(down)
+				translateMouseDownEvent(1, xDir, yDir);
+			else
+				translateMouseUpEvent(1, xDir, yDir);
+			break;
+
+		case 1:
+			if(down)
+				translateMouseDownEvent(3, xDir, yDir);
+			else
+				translateMouseUpEvent(3, xDir, yDir);
+			break;
+
+		case 10:
+			{
+			pp_uint16 chr2[3] = {'O', 0, 0};
+			PPEvent event3(eKeyDown, &chr2, sizeof(chr2));
+			RaiseEventSerialized(&event3);
+			}
+			break;
+
+		case 11:
+		{
+			pp_uint16 chr[3] = {VK_RETURN, 0, 0};
+			PPEvent event(eKeyDown, &chr, sizeof(chr));
+			RaiseEventSerialized(&event);
+		}
+			break;
+
+	}
+	myDisplayDevice->update();
+}
+
 void processSDLEvents(const SDL_Event& event)
 {
 	pp_uint32 mouseButton = 0;
-
+	
 	switch (event.type)
 	{
+		case SDL_JOYAXISMOTION:
+			if (event.jaxis.axis == 0)
+				mouseValX = event.jaxis.value;
+			else
+				mouseValY = event.jaxis.value;
+			break;
+
+		case SDL_JOYBUTTONDOWN:
+             MouseButton(event.jbutton.button, 1);
+             break;
+
+		case SDL_JOYBUTTONUP:
+             MouseButton(event.jbutton.button, 0);
+             break;
+			 
 		case SDL_MOUSEBUTTONDOWN:
 			mouseButton = event.button.button;
 			translateMouseDownEvent(mouseButton, event.button.x, event.button.y);
@@ -685,6 +763,7 @@ void processSDLUserEvents(const SDL_UserEvent& event)
 		case SDLUserEventTimer:
 		{
 			// Prevent new timer events being pushed while we are processing the current one
+			MouseAxis();
 			ticking = false;
 			PPEvent myEvent(eTimer);
 			RaiseEventSerialized(&myEvent);
@@ -781,7 +860,7 @@ void initTracker(pp_uint32 bpp, PPDisplayDevice::Orientations orientation,
 				 bool swapRedBlue, bool noSplash)
 {
 	// Initialize SDL
-	if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 )
+	if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0 )
 	{
 		fprintf(stderr, "Couldn't initialize SDL: %s\n",SDL_GetError());
 		exit(EXIT_FAILURE);
@@ -841,6 +920,19 @@ myDisplayDevice = new PPDisplayDeviceFB(windowSize.width, windowSize.height, sca
 	// Start capturing text input events
 	SDL_StartTextInput();
 
+	int joysticks = SDL_NumJoysticks();
+    printf("There are %d joysticks connected.\n", joysticks);
+
+    // If there are joysticks connected, open one up for reading
+    if (joysticks > 0) {
+        if (SDL_JoystickOpen(0) == NULL) {
+            printf("There was an error reading from the joystick.\n");
+        }
+    }
+    // If there are no joysticks connected, exit the program.
+    else {
+        printf("There are no joysticks connected. Exiting...\n");
+    }
 
 	// Kickstart SDL event loop last to prevent overflowing message-queue on lowmem systems 
   // splash screen will still be visible
