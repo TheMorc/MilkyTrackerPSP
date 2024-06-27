@@ -121,7 +121,7 @@ void Tracker::initKeyBindings()
 	
 	eventKeyDownBindingsMilkyTracker->addBinding('Q', KeyModifierCTRL, &Tracker::eventKeyDownBinding_ExitApplication);
 
-	eventKeyDownBindingsMilkyTracker->addBinding('O', KeyModifierCTRL, &Tracker::eventKeyDownBinding_Open);
+	eventKeyDownBindingsMilkyTracker->addBinding('O', 0, &Tracker::eventKeyDownBinding_Open);
 	eventKeyDownBindingsMilkyTracker->addBinding('S', KeyModifierCTRL, &Tracker::eventKeyDownBinding_Save);
 	eventKeyDownBindingsMilkyTracker->addBinding('S', KeyModifierCTRL|KeyModifierSHIFT, &Tracker::eventKeyDownBinding_SaveAs);
 	
