@@ -449,24 +449,6 @@ void Tracker::eventKeyDownBinding_RotatePanels()
 {
 	if (screen->getModalControl())
 		return;
-
-	switch( panelrotate ){
-		case PanelRotate::PanelTop:{
-			panelrotate = PanelRotate::PanelTop_Sample;
-			eventKeyDownBinding_InvokeSectionSamples();
-			break;
-		}
-		case PanelRotate::PanelTop_Sample:{
-			panelrotate = PanelRotate::PanelTop_Instrument;
-			eventKeyDownBinding_InvokeSectionInstruments();
-			break;
-		}
-		case PanelRotate::PanelTop_Instrument:{
-			panelrotate = PanelRotate::PanelTop;
-			sectionSwitcher->showBottomSection(SectionSwitcher::ActiveBottomSectionNone);
-			break;
-		}
-	}
 	screen->paint(true, true);
 }
 
