@@ -70,25 +70,12 @@ PPDisplayDeviceFB::PPDisplayDeviceFB(pp_int32 width,
 	SDL_GetRendererOutputSize(theRenderer, &rendererW, &rendererH);
 #endif
 
-	// Log renderer capabilities
-	SDL_RendererInfo theRendererInfo;
-	if (!SDL_GetRendererInfo(theRenderer, &theRendererInfo))
-	{
-		if (theRendererInfo.flags & SDL_RENDERER_SOFTWARE) printf("SDL: Using software renderer.\n");
-		if (theRendererInfo.flags & SDL_RENDERER_ACCELERATED) printf("SDL: Using accelerated renderer.\n");
-		if (theRendererInfo.flags & SDL_RENDERER_PRESENTVSYNC) printf("SDL: Vsync enabled.\n");
-		if (theRendererInfo.flags & SDL_RENDERER_TARGETTEXTURE) printf("SDL: Renderer supports rendering to texture.\n");
-	}
-
 	// Lock aspect ratio and scale the UI up to fit the window
 #ifdef HIDPI_SUPPORT
 	SDL_RenderSetLogicalSize(theRenderer, rendererW, rendererH);
 #else
 	SDL_RenderSetLogicalSize(theRenderer, realWidth, realHeight);
 #endif
-
-	// Use linear filtering for the scaling (make this optional eventually)
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
 	// Create surface for rendering graphics
 	theSurface = SDL_CreateRGBSurface(0, realWidth, realHeight, bpp == -1 ? 32 : bpp, 0, 0, 0, 0);
@@ -209,6 +196,8 @@ void PPDisplayDeviceFB::close()
 	currentGraphics->lock = true;
 }
 
+SDL_Rect mouse;
+
 void PPDisplayDeviceFB::update()
 {
 	if (!isUpdateAllowed() || !isEnabled())
@@ -226,6 +215,11 @@ void PPDisplayDeviceFB::update()
 	SDL_UpdateTexture(theTexture, NULL, theSurface->pixels, theSurface->pitch);
 	SDL_RenderClear(theRenderer);
 	SDL_RenderCopy(theRenderer, theTexture, NULL, NULL);
+	SDL_GetGlobalMouseState(&mouse.x, &mouse.y);
+	SDL_SetRenderDrawColor(theRenderer, 255, 255, 255, 255);
+	SDL_RenderDrawLine(theRenderer, mouse.x, mouse.y, mouse.x+20, mouse.y+20);
+	SDL_RenderDrawLine(theRenderer, mouse.x, mouse.y, mouse.x+10, mouse.y);
+	SDL_RenderDrawLine(theRenderer, mouse.x, mouse.y, mouse.x, mouse.y+10);
 	SDL_RenderPresent(theRenderer);
 }
 
@@ -255,6 +249,11 @@ void PPDisplayDeviceFB::update(const PPRect& r)
 	SDL_UpdateTexture(theTexture, &r3, surfaceOffset, theSurface->pitch);
 	SDL_RenderClear(theRenderer);
 	SDL_RenderCopy(theRenderer, theTexture, NULL, NULL);
+	SDL_GetGlobalMouseState(&mouse.x, &mouse.y);
+	SDL_SetRenderDrawColor(theRenderer, 255, 255, 255, 255);
+	SDL_RenderDrawLine(theRenderer, mouse.x, mouse.y, mouse.x+20, mouse.y+20);
+	SDL_RenderDrawLine(theRenderer, mouse.x, mouse.y, mouse.x+10, mouse.y);
+	SDL_RenderDrawLine(theRenderer, mouse.x, mouse.y, mouse.x, mouse.y+10);
 	SDL_RenderPresent(theRenderer);
 }
 
