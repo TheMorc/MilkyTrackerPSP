@@ -1078,13 +1078,13 @@ unrecognizedCommandLineSwitch:
 		
 		struct stat statBuf;
 
-		if (stat(realpath(loadFile, loadFileAbsPath), &statBuf) != 0)
+		if (stat(loadFile, &statBuf) != 0)
 		{
 			fprintf(stderr, "could not open %s: %s\n", loadFile, strerror(errno));
 		}
 		else
 		{
-			SendFile(realpath(loadFile, loadFileAbsPath));
+			SendFile(loadFile);
 			path.change(newCwd);
 			pp_uint16 chr[3] = {VK_RETURN, 0, 0};
 			PPEvent event(eKeyDown, &chr, sizeof(chr));
