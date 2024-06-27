@@ -974,11 +974,13 @@ void SendFile(char *file)
 }
 
 #if defined(__PSP__)
+#include "pspfpu.h"
 extern "C" int SDL_main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
 {
+	pspFpuSetEnable(0);
 	SDL_Event event;
 	char *loadFile = 0;
 	char loadFileAbsPath[PATH_MAX];
