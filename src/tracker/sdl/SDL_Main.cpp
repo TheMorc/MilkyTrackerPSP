@@ -893,9 +893,10 @@ void initTracker(pp_uint32 bpp, PPDisplayDevice::Orientations orientation,
 	bool fullScreen = myTracker->getFullScreenFlagFromDatabase();
 	pp_int32 scaleFactor = myTracker->getScreenScaleFactorFromDatabase();
 
+	
 #ifdef __LOWRES__
-	windowSize.width = DISPLAYDEVICE_WIDTH;
-	windowSize.height = DISPLAYDEVICE_HEIGHT;
+	windowSize.width = 480;
+	windowSize.height = 272;
 #endif
 
 myDisplayDevice = new PPDisplayDeviceFB(windowSize.width, windowSize.height, scaleFactor,
